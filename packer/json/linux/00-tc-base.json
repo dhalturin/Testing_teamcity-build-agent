@@ -1,0 +1,68 @@
+{
+  "builders": [
+    {
+      "type": "virtualbox-iso",
+      "vm_name": "{{ user `vm_name` }}",
+      "iso_url": "{{ user `iso_url` }}",
+      "iso_checksum": "{{ user `iso_hash` }}",
+      "headless": "{{ user `headless` }}",
+      "http_directory": "./packer/http",
+      "shutdown_command": "sudo shutdown -h now",
+      "communicator": "ssh",
+      "ssh_username": "{{ user `ssh_username` }}",
+      "ssh_password": "{{ user `ssh_password` }}",
+      "ssh_pty": true,
+      "guest_os_type": "Ubuntu_64",
+      "disk_size": "{{ user `disk_size` }}",
+      "output_directory": "{{ user `vm_output` }}/{{ user `vm_name` }}",
+      "vboxmanage": [
+        ["modifyvm", "{{ .Name }}", "--memory", "{{ user `memory` }}"],
+        ["modifyvm", "{{ .Name }}", "--cpus", "{{ user `cpus` }}"],
+        ["modifyvm", "{{ .Name }}", "--natpf1", "r1,tcp,,2222,,22"],
+        ["setextradata", "{{ .Name }}", "GUI/ScaleFactor", "3"]
+      ],
+      "boot_wait": "5s",
+      "boot_command": [
+        "<esc><esc><enter><wait>",
+        "/install/vmlinuz noapic auto <wait>",
+        "initrd=/install/initrd.gz <wait>",
+        "preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/{{ user `preseed`}} <wait>",
+        "debian-installer=en_US locale=en_US kbd-chooser/method=us ",
+        "hostname={{ .Name }} ",
+        "grub-installer/bootdev=/dev/sda <wait>",
+        "fb=false debconf/frontend=noninteractive ",
+        "keyboard-configuration/modelcode=SKIP keyboard-configuration/layout=USA ",
+        "keyboard-configuration/variant=USA console-setup/ask_detect=false ",
+        "passwd/user-password={{ user `ssh_password`}} ",
+        "passwd/user-password-again={{ user `ssh_password`}} ",
+        "passwd/username={{ user `ssh_username`}} ",
+        "-- <enter>"
+      ]
+    }
+  ],
+  "provisioners": [
+    {
+      "environment_vars": [
+        "DEBIAN_FRONTEND=noninteractive",
+        "SSH_USERNAME={{ user `ssh_username` }}"
+      ],
+      "execute_command": "echo '{{ user `ssh_password` }}' | {{ .Vars }} sudo -E -S bash '{{ .Path }}'",
+      "expect_disconnect": true,
+      "scripts": ["./packer/shell/prepare.sh"],
+      "type": "shell"
+    }
+  ],
+  "variables": {
+    "headless": "{{ env `PACKER_HEADLESS` }}",
+    "iso_url": "{{ env `LINUX_ISO` }}",
+    "iso_hash": "{{ env `LINUX_SUM` }}",
+    "disk_size": "10240",
+    "memory": "1024",
+    "cpus": "1",
+    "ssh_username": "{{ env `USER_NAME` }}",
+    "ssh_password": "{{ env `USER_PASS` }}",
+    "preseed": "ubuntu-19.10-server.cfg",
+    "vm_output": "./packer/images/linux",
+    "vm_name": "tc-linux-base"
+  }
+}
