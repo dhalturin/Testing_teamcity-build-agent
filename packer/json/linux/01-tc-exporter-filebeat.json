@@ -1,0 +1,53 @@
+{
+  "builders": [
+    {
+      "type": "virtualbox-ovf",
+      "vm_name": "{{ user `vm_name` }}",
+      "source_path": "{{ user `vm_output` }}/{{ user `vm_source` }}/{{ user `vm_source` }}.ovf",
+      "headless": "{{ user `headless` }}",
+      "shutdown_command": "sudo shutdown -h now",
+      "communicator": "ssh",
+      "ssh_username": "{{ user `ssh_username` }}",
+      "ssh_password": "{{ user `ssh_password` }}",
+      "ssh_pty": true,
+      "output_directory": "{{ user `vm_output` }}/{{ user `vm_name` }}",
+      "vboxmanage": [
+        ["modifyvm", "{{ .Name }}", "--memory", "{{ user `memory` }}"],
+        ["modifyvm", "{{ .Name }}", "--cpus", "{{ user `cpus` }}"],
+        ["modifyvm", "{{ .Name }}", "--natpf1", "r2,tcp,,9100,,9100"],
+        ["setextradata", "{{ .Name }}", "GUI/ScaleFactor", "3"]
+      ]
+    }
+  ],
+  "provisioners": [
+    {
+      "environment_vars": [
+        "DEBIAN_FRONTEND=noninteractive",
+        "SSH_USERNAME={{ user `ssh_username` }}",
+        "TC_SERVER={{ user `tc-server` }}",
+        "LS_SERVER={{ user `ls-server` }}"
+      ],
+      "execute_command": "echo '{{ user `ssh_password` }}' | {{ .Vars }} sudo -E -S bash '{{ .Path }}'",
+      "expect_disconnect": true,
+      "scripts": [
+        "./packer/shell/secure.sh",
+        "./packer/shell/teamcity.sh",
+        "./packer/shell/node_exporter.sh",
+        "./packer/shell/filebeat.sh"
+      ],
+      "type": "shell"
+    }
+  ],
+  "variables": {
+    "headless": "{{ env `PACKER_HEADLESS` }}",
+    "tc-server": "{{ env `TC_SERVER` }}",
+    "ls-server": "{{ env `LS_SERVER` }}",
+    "memory": "2048",
+    "cpus": "2",
+    "ssh_username": "{{ env `USER_NAME` }}",
+    "ssh_password": "{{ env `USER_PASS` }}",
+    "vm_output": "./packer/images/linux",
+    "vm_name": "tc-linux-exporter-filebeat",
+    "vm_source": "tc-linux-base"
+  }
+}
