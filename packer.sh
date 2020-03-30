@@ -34,17 +34,17 @@ msg_failure() {
 
 build() {
     case ${1} in
-        all) build_linux && build_windows ;;
-        linux) build_linux ;;
-        windows ) build_windows ;;
+        all)
+            build "linux"
+            build "windows"
+            return
+        ;;
+        linux) ;;
+        windows ) ;;
         *) msg_failure "Incorrect argument" ;;
     esac
 
-    cleanup
-}
-
-build_linux() {
-    find ./packer/json/linux -type f | sort | while read json; do
+    find ./packer/json/${1} -type f | sort | while read json; do
         IMAGE_PATH=$(jq -r '.variables.vm_output + "/" + .variables.vm_name' ${json})
 
         if [ "${FORCE}" = "true" ]; then
@@ -65,10 +65,6 @@ build_linux() {
         echo "Building from json file: ${json}"
         ${PACKER_BIN} build ${json} || break
     done
-}
-
-build_windows() {
-    echo build windows
 }
 
 check_command() {
@@ -128,12 +124,6 @@ prepare() {
     download_packer
 }
 
-cleanup() {
-    if [ -f ./vault/.pid_file ]; then
-        cat ./vault/.pid_file | xargs kill
-    fi
-}
-
 set_force() {
     FORCE=true
 }
@@ -145,7 +135,6 @@ fi
 while getopts ":b:cfhp" opt; do
     case $opt in
         b) build ${OPTARG} ;;
-        c) cleanup ;;
         f) set_force ;;
         h) msg_usage ;;
         p) prepare ;;
