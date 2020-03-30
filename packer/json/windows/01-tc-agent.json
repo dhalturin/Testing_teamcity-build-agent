@@ -1,0 +1,44 @@
+{
+  "builders": [
+    {
+      "type": "virtualbox-ovf",
+      "vm_name": "{{ user `vm_name` }}",
+      "source_path": "{{ user `vm_output` }}/{{ user `vm_source` }}/{{ user `vm_source` }}.ovf",
+      "headless": "{{ user `headless` }}",
+      "shutdown_command": "shutdown /s /t 5 /f /d p:4:1 /c shutdown",
+      "communicator": "winrm",
+      "winrm_username": "{{ user `packer_username` }}",
+      "winrm_password": "{{ user `packer_password` }}",
+      "winrm_timeout": "1h",
+      "guest_additions_mode": "disable",
+      "output_directory": "{{ user `vm_output` }}/{{ user `vm_name` }}",
+      "vboxmanage": [
+        ["modifyvm", "{{ .Name }}", "--memory", "{{ user `memory` }}"],
+        ["modifyvm", "{{ .Name }}", "--cpus", "{{ user `cpus` }}"],
+        ["setextradata", "{{ .Name }}", "GUI/ScaleFactor", "2"]
+      ]
+    }
+  ],
+  "provisioners": [
+    {
+      "environment_vars": [
+        "TC_SERVER={{ user `tc-server` }}",
+        "JRE_EXE={{ user `jre-exe` }}"
+      ],
+      "scripts": ["./packer/scripts/windows/teamcity.ps1"],
+      "type": "powershell"
+    }
+  ],
+  "variables": {
+    "headless": "{{ env `PACKER_HEADLESS` }}",
+    "tc-server": "{{ env `TC_SERVER` }}",
+    "jre-exe": "{{ env `JRE_EXE` }}",
+    "memory": "2048",
+    "cpus": "2",
+    "packer_username": "{{ env `USER_NAME` }}",
+    "packer_password": "{{ env `USER_PASS` }}",
+    "vm_output": "./packer/images/windows",
+    "vm_name": "tc-windows-agent",
+    "vm_source": "tc-windows-base"
+  }
+}
