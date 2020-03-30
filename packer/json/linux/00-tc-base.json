@@ -9,8 +9,8 @@
       "http_directory": "./packer/http",
       "shutdown_command": "sudo shutdown -h now",
       "communicator": "ssh",
-      "ssh_username": "{{ user `ssh_username` }}",
-      "ssh_password": "{{ user `ssh_password` }}",
+      "ssh_username": "{{ user `packer_username` }}",
+      "ssh_password": "{{ user `packer_password` }}",
       "ssh_pty": true,
       "guest_os_type": "Ubuntu_64",
       "disk_size": "{{ user `disk_size` }}",
@@ -33,9 +33,9 @@
         "fb=false debconf/frontend=noninteractive ",
         "keyboard-configuration/modelcode=SKIP keyboard-configuration/layout=USA ",
         "keyboard-configuration/variant=USA console-setup/ask_detect=false ",
-        "passwd/user-password={{ user `ssh_password`}} ",
-        "passwd/user-password-again={{ user `ssh_password`}} ",
-        "passwd/username={{ user `ssh_username`}} ",
+        "passwd/user-password={{ user `packer_password`}} ",
+        "passwd/user-password-again={{ user `packer_password`}} ",
+        "passwd/username={{ user `packer_username`}} ",
         "-- <enter>"
       ]
     }
@@ -44,11 +44,11 @@
     {
       "environment_vars": [
         "DEBIAN_FRONTEND=noninteractive",
-        "SSH_USERNAME={{ user `ssh_username` }}"
+        "SSH_USERNAME={{ user `packer_username` }}"
       ],
-      "execute_command": "echo '{{ user `ssh_password` }}' | {{ .Vars }} sudo -E -S bash '{{ .Path }}'",
+      "execute_command": "echo '{{ user `packer_password` }}' | {{ .Vars }} sudo -E -S bash '{{ .Path }}'",
       "expect_disconnect": true,
-      "scripts": ["./packer/shell/prepare.sh"],
+      "scripts": ["./packer/scripts/linux/prepare.sh"],
       "type": "shell"
     }
   ],
@@ -59,8 +59,8 @@
     "disk_size": "10240",
     "memory": "1024",
     "cpus": "1",
-    "ssh_username": "{{ env `USER_NAME` }}",
-    "ssh_password": "{{ env `USER_PASS` }}",
+    "packer_username": "{{ env `USER_NAME` }}",
+    "packer_password": "{{ env `USER_PASS` }}",
     "preseed": "ubuntu-19.10-server.cfg",
     "vm_output": "./packer/images/linux",
     "vm_name": "tc-linux-base"
