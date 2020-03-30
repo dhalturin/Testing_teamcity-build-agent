@@ -1,0 +1,44 @@
+{
+  "builders": [
+    {
+      "type": "virtualbox-iso",
+      "vm_name": "{{ user `vm_name` }}",
+      "iso_url": "{{ user `iso_url` }}",
+      "iso_checksum": "{{ user `iso_hash` }}",
+      "headless": "{{ user `headless` }}",
+      "floppy_files": [
+        "./packer/scripts/windows/autounattend.xml",
+        "./packer/scripts/windows/prepare.ps1"
+      ],
+      "shutdown_command": "shutdown /s /t 5 /f /d p:4:1 /c shutdown",
+      "communicator": "winrm",
+      "winrm_username": "{{ user `packer_username` }}",
+      "winrm_password": "{{ user `packer_password` }}",
+      "winrm_timeout": "1h",
+      "winrm_insecure": true,
+      "guest_os_type": "Windows10_64",
+      "guest_additions_mode": "disable",
+      "disk_size": "{{ user `disk_size` }}",
+      "output_directory": "{{ user `vm_output` }}/{{ user `vm_name` }}",
+      "vboxmanage": [
+        ["modifyvm", "{{ .Name }}", "--memory", "{{ user `memory` }}"],
+        ["modifyvm", "{{ .Name }}", "--cpus", "{{ user `cpus` }}"],
+        ["modifyvm", "{{ .Name }}", "--natpf1", "r1,tcp,,3389,,3389"],
+        ["modifyvm", "{{ .Name }}", "--vram", "32"],
+        ["setextradata", "{{ .Name }}", "GUI/ScaleFactor", "2"]
+      ]
+    }
+  ],
+  "variables": {
+    "headless": "{{ env `PACKER_HEADLESS` }}",
+    "iso_url": "{{ env `WINDOWS_ISO` }}",
+    "iso_hash": "{{ env `WINDOWS_SUM` }}",
+    "disk_size": "25600",
+    "memory": "1024",
+    "cpus": "1",
+    "packer_username": "{{ env `USER_NAME` }}",
+    "packer_password": "{{ env `USER_PASS` }}",
+    "vm_output": "./packer/images/windows",
+    "vm_name": "tc-windows-base"
+  }
+}
