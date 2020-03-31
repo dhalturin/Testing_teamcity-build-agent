@@ -12,8 +12,7 @@ msg_usage() {
     echo -e "\t\$ ${0} -p\n"
     echo -e "Some of the options include:"
     echo -e "\t-b\tBuilding images. Arguments: all / linux / windows"
-    echo -e "\t-c\tClean up. Shutdown vault server"
-    echo -e "\t-f\tUse this flag for rebuild images"
+    echo -e "\t-f\tForce. Use this flag for rebuild images"
     echo -e "\t-h\tThis message"
     echo -e "\t-p\tPreparation before building images. Download packer"
     exit
@@ -132,7 +131,7 @@ if [ -z "${*}" ]; then
     msg_usage
 fi
 
-while getopts ":b:cfhp" opt; do
+while getopts ":b:fhp" opt; do
     case $opt in
         b) build ${OPTARG} ;;
         f) set_force ;;
