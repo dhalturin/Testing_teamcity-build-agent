@@ -25,7 +25,9 @@
         "DEBIAN_FRONTEND=noninteractive",
         "SSH_USERNAME={{ user `packer_username` }}",
         "TC_SERVER={{ user `tc-server` }}",
-        "LS_SERVER={{ user `ls-server` }}"
+        "LS_SERVER={{ user `ls-server` }}",
+        "EXPORTER_VERSION={{ user `exporter-version` }}",
+        "FILEBEAT_VERSION={{ user `filebeat-version` }}"
       ],
       "execute_command": "echo '{{ user `packer_password` }}' | {{ .Vars }} sudo -E -S bash '{{ .Path }}'",
       "expect_disconnect": true,
@@ -42,6 +44,8 @@
     "headless": "{{ env `PACKER_HEADLESS` }}",
     "tc-server": "{{ env `TC_SERVER` }}",
     "ls-server": "{{ env `LS_SERVER` }}",
+    "exporter-version": "{{ env `EXPORTER_VERSION` }}",
+    "filebeat-version": "{{ env `FILEBEAT_VERSION` }}",
     "memory": "2048",
     "cpus": "2",
     "packer_username": "{{ env `USER_NAME` }}",

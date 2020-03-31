@@ -1,7 +1,7 @@
 #!/bin/bash
 
-apt-get install -y -qq prometheus-node-exporter
+apt-get install -y -qq prometheus-node-exporter=${EXPORTER_VERSION}
 
-# apt-get update
+apt-mark hold prometheus-node-exporter
 
 systemctl enable prometheus-node-exporter

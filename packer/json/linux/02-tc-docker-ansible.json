@@ -24,7 +24,10 @@
         "DEBIAN_FRONTEND=noninteractive",
         "SSH_USERNAME={{ user `packer_username` }}",
         "TC_SERVER={{ user `tc-server` }}",
-        "LS_SERVER={{ user `ls-server` }}"
+        "LS_SERVER={{ user `ls-server` }}",
+        "ANSIBLE_VERSION={{ user `ansible-version` }}",
+        "DOCKER_VERSION={{ user `docker-version` }}",
+        "DOCKER_COMPOSE_VERSION={{ user `docker-compose-version` }}"
       ],
       "execute_command": "echo '{{ user `packer_password` }}' | {{ .Vars }} sudo -E -S bash '{{ .Path }}'",
       "expect_disconnect": true,
@@ -37,6 +40,9 @@
   ],
   "variables": {
     "headless": "{{ env `PACKER_HEADLESS` }}",
+    "ansible-version": "{{ env `ANSIBLE_VERSION` }}",
+    "docker-version": "{{ env `DOCKER_VERSION` }}",
+    "docker-compose-version": "{{ env `DOCKER_COMPOSE_VERSION` }}",
     "memory": "2048",
     "cpus": "2",
     "packer_username": "{{ env `USER_NAME` }}",
