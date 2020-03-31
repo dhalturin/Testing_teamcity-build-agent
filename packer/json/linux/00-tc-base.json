@@ -3,7 +3,7 @@
     {
       "type": "virtualbox-iso",
       "vm_name": "{{ user `vm_name` }}",
-      "iso_url": "{{ user `iso_url` }}",
+      "iso_urls": ["{{ user `iso_file` }}", "{{ user `iso_url` }}"],
       "iso_checksum": "{{ user `iso_hash` }}",
       "headless": "{{ user `headless` }}",
       "http_directory": "./packer/http",
@@ -54,7 +54,8 @@
   ],
   "variables": {
     "headless": "{{ env `PACKER_HEADLESS` }}",
-    "iso_url": "{{ env `LINUX_ISO` }}",
+    "iso_file": "{{ env `LINUX_ISO_FILE` }}",
+    "iso_url": "{{ env `LINUX_ISO_URL` }}",
     "iso_hash": "{{ env `LINUX_SUM` }}",
     "disk_size": "10240",
     "memory": "1024",
