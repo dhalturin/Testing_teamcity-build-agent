@@ -14,7 +14,7 @@ msg_usage() {
     echo -e "\t-b\tBuilding images. Arguments: all / linux / windows"
     echo -e "\t-f\tForce. Use this flag for rebuild images"
     echo -e "\t-h\tThis message"
-    echo -e "\t-p\tPreparation before building images. Download packer"
+    echo -e "\t-p\tPre-build preparation and downloading packer"
     exit
 }
 
